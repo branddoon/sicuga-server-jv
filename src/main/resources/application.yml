@@ -1,0 +1,17 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://127.0.0.1:27018/sicugadev
+      database: sicugadev
+app:
+  jwt-secret: JWTSecretKey
+  jwt-expiration-milliseconds: 604800000
+  info-deploy-with-debug: java -jar -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 sicuga-server-0.0.1-SNAPSHOT.jar
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG
