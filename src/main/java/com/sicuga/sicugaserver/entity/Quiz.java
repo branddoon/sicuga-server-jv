@@ -3,13 +3,10 @@ package com.sicuga.sicugaserver.entity;
 import com.sicuga.sicugaserver.model.QuizDtl;
 import lombok.Getter;
 import lombok.Setter;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.FieldType;
-import org.springframework.data.mongodb.core.mapping.MongoId;
-
-import java.time.ZonedDateTime;
+import org.springframework.data.mongodb.core.mapping.*;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -21,7 +18,8 @@ public class Quiz {
     @MongoId(FieldType.STRING)
     private String id;
 
-    private GeneralUserAuth generalUserAuth;
+    @Field("user")
+    private ObjectId generalUserAuth;
 
     private String name;
 
@@ -29,5 +27,8 @@ public class Quiz {
 
     private List<QuizDtl> listParam;
 
-    private ZonedDateTime zonedDateTime;
+    private Date updatedAt;
+
+    private Date createdAt;
+
 }

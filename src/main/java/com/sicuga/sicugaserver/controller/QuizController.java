@@ -17,9 +17,9 @@ public class QuizController {
     @Autowired
     private QuizServiceImpl quizService;
 
-    @PostMapping("/registerQuiz")
+    @PostMapping("/saveQuiz")
     public ResponseEntity<QuizDTOResponse> registerQuiz(@RequestBody QuizDTORequest quizDTO){
-        return quizService.registerQuiz(quizDTO);
+        return quizService.saveQuiz(quizDTO);
     }
 
     @GetMapping("/{idQuiz}")
@@ -27,9 +27,9 @@ public class QuizController {
         return quizService.getQuiz(idQuiz);
     }
 
-    @GetMapping("/listAllQuiz")
-    public ResponseEntity<List<QuizDTOResponse>> getAllQuizByUser(){
-        return quizService.getAllQuizByUser();
+    @GetMapping("/listAll/{idUser}")
+    public ResponseEntity<List<QuizDTOResponse>> getAllQuizByUser(@PathVariable(value = "idUser") String idUser){
+        return quizService.getAllQuizByUser(idUser);
     }
 
     @DeleteMapping("/{idQuiz}")

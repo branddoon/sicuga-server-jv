@@ -1,6 +1,5 @@
 package com.sicuga.sicugaserver.entity;
 
-
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -10,11 +9,11 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 
 @Getter
 @Setter
-@Document("GeneralUserAuth")
+@Document("User")
 public class GeneralUserAuth {
 
     @Id
-    @MongoId(FieldType.STRING)
+    @MongoId(FieldType.OBJECT_ID)
     private String id;
 
     private String name;
@@ -23,6 +22,6 @@ public class GeneralUserAuth {
 
     private String password;
 
-    private boolean enable;
+    private boolean online;
 
 }

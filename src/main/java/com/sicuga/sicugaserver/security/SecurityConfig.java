@@ -27,6 +27,9 @@ public class SecurityConfig {
     CustomUserDetailsService customUserDetailsService;
 
     @Autowired
+    JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+    @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
     }
@@ -44,11 +47,12 @@ public class SecurityConfig {
                     (requests) -> {
                         requests
                         .requestMatchers(new AntPathRequestMatcher("/api/auth/**")).permitAll()
-                        .anyRequest().authenticated()
+                                .anyRequest().authenticated()
                         .and().addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-                });
+                }).exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
         return http.build();
     }
+
     @Bean
     public static BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -59,17 +63,5 @@ public class SecurityConfig {
             throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-/*
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET","POST","DELETE"));
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
- */
-
 
 }

@@ -15,3 +15,11 @@ logging:
           mongodb:
             core:
               MongoTemplate: DEBUG
+
+
+
+server:
+  error:
+    include-binding-errors: always
+    include-message: always
+

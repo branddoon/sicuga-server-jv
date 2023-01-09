@@ -8,6 +8,7 @@ import com.sicuga.sicugaserver.exception.GlobalException;
 import com.sicuga.sicugaserver.repository.GeneralUserAuthRepository;
 import com.sicuga.sicugaserver.repository.QuizRepository;
 import lombok.extern.log4j.Log4j2;
+import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,9 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Log4j2
 @Service
@@ -32,15 +32,11 @@ public class QuizServiceImpl {
     @Autowired
     ModelMapper modelMapper;
 
-    public ResponseEntity<QuizDTOResponse> registerQuiz(QuizDTORequest quizDTO){
+    public ResponseEntity<QuizDTOResponse> saveQuiz(QuizDTORequest quizDTO){
         QuizDTOResponse quizDTOResponse;
-        try{
-            Quiz quiz = quizRepository.save(mapperQuiz(quizDTO));
-            quizDTOResponse = modelMapper.map(quiz,QuizDTOResponse.class);
-        }catch (Exception e){
-            log.info("Error during saving quiz: {}", e.getMessage());
-            throw new GlobalException("Error during quiz saved. Contact your administrator for support.",HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        Quiz quiz = quizRepository.save(mapperQuiz(quizDTO));
+        quizDTOResponse = modelMapper.map(quiz,QuizDTOResponse.class);
+        quizDTOResponse.setUpdatedAt(getSimpleDateFormat(quiz));
         return new ResponseEntity<>(quizDTOResponse,HttpStatus.OK);
     }
 
@@ -48,17 +44,20 @@ public class QuizServiceImpl {
         Quiz quiz = quizRepository.findById(idQuiz)
                 .orElseThrow(()->new GlobalException("Quiz was not found.", HttpStatus.INTERNAL_SERVER_ERROR));
         QuizDTOResponse quizDTOResponse = modelMapper.map(quiz, QuizDTOResponse.class);
+        quizDTOResponse.setUpdatedAt(getSimpleDateFormat(quiz));
         return new ResponseEntity<>(quizDTOResponse,HttpStatus.OK);
     }
 
-    public ResponseEntity<List<QuizDTOResponse>> getAllQuizByUser(){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        GeneralUserAuth userAuth= generalUserAuthService.findUserByEmail(email);
-        List<Quiz> quizzes = quizRepository.findByGeneralUserAuth_Id(userAuth.getId()).get();
+    public ResponseEntity<List<QuizDTOResponse>> getAllQuizByUser(String idUser){
+        GeneralUserAuth userAuth = generalUserAuthService.findUserById(idUser);
+        List<Quiz> quizzes = quizRepository.findByGeneralUserAuth(new ObjectId(userAuth.getId())).get();
         List<QuizDTOResponse> quizzesDTO = new ArrayList<QuizDTOResponse>();
         quizzes.forEach(
-                quiz -> quizzesDTO.add(modelMapper.map(quiz,QuizDTOResponse.class))
-        );
+                quiz -> {
+                    QuizDTOResponse quizDTOResponse = modelMapper.map(quiz, QuizDTOResponse.class);
+                    quizDTOResponse.setUpdatedAt(getSimpleDateFormat(quiz));
+                    quizzesDTO.add(quizDTOResponse);
+                });
         return new ResponseEntity<>(quizzesDTO,HttpStatus.OK);
     }
 
@@ -74,8 +73,15 @@ public class QuizServiceImpl {
         quiz.setName(quizDTO.getName());
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         GeneralUserAuth userAuth= generalUserAuthService.findUserByEmail(email);
-        quiz.setGeneralUserAuth(userAuth);
+        quiz.setGeneralUserAuth(new ObjectId(userAuth.getId()));
         quiz.setListParam(quizDTO.getListParam());
+        quiz.setCreatedAt(new Date());
+        quiz.setUpdatedAt(new Date());
         return quiz;
+    }
+
+    private String getSimpleDateFormat(Quiz quiz){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss a",new Locale("en-US"));
+        return sdf.format(quiz.getUpdatedAt());
     }
 }

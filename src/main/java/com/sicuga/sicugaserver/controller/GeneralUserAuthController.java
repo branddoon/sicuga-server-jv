@@ -1,19 +1,11 @@
 package com.sicuga.sicugaserver.controller;
 
 import com.sicuga.sicugaserver.dto.GeneralUserAuthDTO;
-import com.sicuga.sicugaserver.dto.JWTAuthResponseDTO;
 import com.sicuga.sicugaserver.dto.LoginUserRequestDTO;
-import com.sicuga.sicugaserver.entity.GeneralUserAuth;
-import com.sicuga.sicugaserver.security.JwtTokenProvider;
 import com.sicuga.sicugaserver.service.GeneralUserAuthServiceImpl;
-import org.modelmapper.ModelMapper;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,11 +16,11 @@ public class GeneralUserAuthController {
     GeneralUserAuthServiceImpl generalUserAuthService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginUserRequestDTO loginUserDTO){
+    public ResponseEntity<?> login(@Valid @RequestBody LoginUserRequestDTO loginUserDTO){
        return generalUserAuthService.validateLogin(loginUserDTO);
     }
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody GeneralUserAuthDTO userDTO){
+    @PostMapping("/newUser")
+    public ResponseEntity<?> registerUser(@Valid @RequestBody GeneralUserAuthDTO userDTO){
         return generalUserAuthService.saveUser(userDTO);
     }
 

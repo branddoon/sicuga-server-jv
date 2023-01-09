@@ -3,6 +3,7 @@ package com.sicuga.sicugaserver.dto;
 import com.sicuga.sicugaserver.model.QuizDtl;
 import lombok.Getter;
 import lombok.Setter;
+
 import java.util.List;
 
 @Getter
@@ -16,4 +17,6 @@ public class QuizDTOResponse {
     private String description;
 
     private List<QuizDtl> listParam;
+
+    private String updatedAt;
 }

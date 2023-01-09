@@ -1,9 +1,7 @@
 package com.sicuga.sicugaserver.security;
 
-import com.sicuga.sicugaserver.exception.GlobalException;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import java.util.Date;
@@ -40,17 +38,17 @@ public class JwtTokenProvider {
 	public boolean validateToken(String token) {
 		try {
 			Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
-			return true;			
+			return true;
 		}catch(SignatureException ex) {
-			throw new GlobalException("JWT signature is not valid.",HttpStatus.BAD_REQUEST);
+			throw new RuntimeException("JWT signature is not valid.");
 		}catch(MalformedJwtException ex) {
-			throw new GlobalException("JWT token is not valid.",HttpStatus.BAD_REQUEST);
+			throw new RuntimeException("JWT token is not valid.");
 		}catch(ExpiredJwtException ex) {
-			throw new GlobalException("JWT token has expired",HttpStatus.BAD_REQUEST);
+			throw new RuntimeException("JWT token has expired.");
 		}catch(UnsupportedJwtException ex) {
-			throw new GlobalException("JWT token is not supported.",HttpStatus.BAD_REQUEST);
+			throw new RuntimeException("JWT token is not supported.");
 		}catch(IllegalArgumentException ex) {
-			throw new GlobalException("JWT claims is empty.",HttpStatus.BAD_REQUEST);
+			throw new RuntimeException("JWT claims is empty.");
 		}
 	} 
 }

@@ -49,24 +49,23 @@ public class GeneralUserAuthServiceImpl {
     public ResponseEntity<?> saveUser(GeneralUserAuthDTO userDTO){
         GeneralUserAuth userAuth = modelMapper.map(userDTO, GeneralUserAuth.class);
         if(generalUserAuthRepository.existsByEmail(userAuth.getEmail())){
-            throw new GlobalException("Email already exists. Please validate your information.",HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new GlobalException("Email already exists.",HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        try{
-            userAuth.setPassword(bCryptPasswordEncoder.encode(userAuth.getPassword()));
-            generalUserAuthRepository.save(userAuth);
-        }catch (Exception e){
-            log.info("Error during saving user:{}",e.getMessage());
-            throw new GlobalException("Error during user saved. Contact your administrator for support.",HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        userAuth.setPassword(bCryptPasswordEncoder.encode(userAuth.getPassword()));
+        generalUserAuthRepository.save(userAuth);
         String token = jwtTokenProvider.renewToken(userAuth.getEmail());
         return new ResponseEntity<>(mapperAuthResponse(token,userAuth), HttpStatus.OK);
     }
 
     public GeneralUserAuth findUserByEmail(String email){
         return generalUserAuthRepository.findByEmail(email)
-                .orElseThrow(()->new GlobalException("The following email was not found.:" + email, HttpStatus.INTERNAL_SERVER_ERROR));
+                .orElseThrow(()->new GlobalException("User was not found.", HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
+    public GeneralUserAuth findUserById(String id){
+        return generalUserAuthRepository.findById(id)
+                .orElseThrow(()->new GlobalException("User was not found.", HttpStatus.INTERNAL_SERVER_ERROR));
+    }
     public ResponseEntity<?> renewToken(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         String token = jwtTokenProvider.renewToken(email);
